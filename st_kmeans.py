@@ -5,28 +5,33 @@ from sklearn import preprocessing
 
 st.set_page_config(layout="wide")
 
+# Judul Aplikasi (Header Halaman Depan)
 st.write("""<h3 align="center">Aplikasi K-Means Clustering""", unsafe_allow_html=True)
 st.write("")
 
 # Tambahkan tombol untuk mengupload file excel
-uploaded_file = st.file_uploader("Upload File Excel")
+uploaded_file = st.file_uploader("Upload File")
 
 # Jika file excel berhasil diupload
 if uploaded_file is not None:
     # Baca file excel menggunakan Pandas
     data1 = pd.read_excel(uploaded_file, engine="openpyxl")
 
-    # Tampilkan data awal
+    # Tampilkan data yang di uploads
     st.write("Data Awal")
     st.write(data1)
+
+    # Input Jumlah Cluster
     cluster = st.sidebar.number_input("Jumlah Cluster", min_value=0, step=1)
+
+    # Tampilkan informasi jumlah cluster
     st.sidebar.write(f"Jumlah Cluster: {cluster}")
 
     # Jika data awal berhasil diunggah
     if data1 is not None:
-        # Pilih centroid dari data yang diupload
         st.sidebar.write("")
-        # titik_centroid = st.sidebar.multiselect("Pilih Centroid", data1.columns)
+
+        # Pilih centroid dari data yang diupload
         titik_centroid = st.sidebar.multiselect("Pilih Centroid", data1.index.tolist())
 
         # Jika centroid dipilih dan jumlah titik centroid sesuai dengan jumlah cluster
@@ -38,6 +43,7 @@ if uploaded_file is not None:
             data2 = data1.drop(drop_kolom, axis=1)
             titik_centroid = data2.loc[titik_centroid].values.tolist()
 
+            # Tampilkan Titik Centroid yang telah dipilih
             st.write("Titik centroid")
             st.write(pd.DataFrame(titik_centroid, columns=data2.columns))
 
@@ -47,7 +53,6 @@ if uploaded_file is not None:
 
             # Jika jumlah cluster valid
             if cluster >= 1:
-                # Tampilkan informasi jumlah cluster
                 if st.button("Mulai Proses"):
                     # Membuat Variabel untuk Normalisasi MinMax
                     minmax = preprocessing.MinMaxScaler().fit_transform(data2)
@@ -88,9 +93,16 @@ if uploaded_file is not None:
                         st.write("Chart Perbandingan Data Antar Cluster")
                         st.bar_chart(bar_cluster)
 
+                    # Buat Keterangan Cluster
+                    keterangan_cluster = {
+                        0: "Sangat Baik",
+                        1: "Cukup Baik",
+                        2: "Baik",
+                    }
                     # Tampilkan hasil clustering
                     st.write("Hasil Clustering")
                     data3["cluster"] = kmeans.labels_
+                    data3["cluster"] = data3["cluster"].map(keterangan_cluster)
                     data4 = pd.concat(
                         [data1[drop_kolom], data2, data3["cluster"]], axis=1
                     )
