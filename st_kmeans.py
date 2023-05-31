@@ -99,6 +99,10 @@ if uploaded_file is not None:
                         1: "Cukup Baik",
                         2: "Baik",
                     }
+                    
+                    # Keterangan Cluster
+                    st.markdown(keterangan_cluster)
+                    
                     # Tampilkan hasil clustering
                     st.write("Hasil Clustering")
                     data3["cluster"] = kmeans.labels_
